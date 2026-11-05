@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta name="robots" content="noindex, nofollow" />
+    <script>// Stands in for the CMS on GitHub Pages: reads come from data.json, a form send goes nowhere.
+;(() => {
+  const BASE = '/allrisk-investment/'
+  const realFetch = window.fetch.bind(window)
+  let data
+  const snapshot = () => (data ??= realFetch(`${BASE}data.json`).then((r) => r.json()))
+  const json = (body) =>
+    new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } })
+
+  window.fetch = async (input, init) => {
+    const url = new URL(typeof input === 'string' ? input : input.url ?? input, location.href)
+    if (url.origin !== location.origin || !url.pathname.startsWith('/api/'))
+      return realFetch(input, init)
+    if ((init?.method ?? 'GET').toUpperCase() !== 'GET') return json({ ok: true })
+    const key = decodeURI(url.pathname + url.search)
+    const all = await snapshot()
+    if (key in all) return json(all[key])
+    console.warn('[preview] not in the snapshot:', key)
+    return json({ docs: [] })
+  }
+
+  // Plain anchors (editor links) carry a root path; the router's own links already have the base.
+  document.addEventListener(
+    'click',
+    (event) => {
+      const a = event.target.closest?.('a[href^="/"]')
+      const href = a?.getAttribute('href')
+      if (!href || href.startsWith('//') || href.startsWith(BASE)) return
+      event.preventDefault()
+      event.stopPropagation()
+      location.href = BASE + href.slice(1)
+    },
+    true,
+  )
+})()
+</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- One head for every site: favicon, title rule (`documentTitle`), Open Graph. -->
+    <link rel="icon" type="image/svg+xml" href="/allrisk-investment/favicon.svg" />
+    <link rel="apple-touch-icon" href="/allrisk-investment/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0046c8" />
+    <title>Allrisk Investment</title>
+    <meta
+      name="description"
+      content="Dluhopisy Allrisk Investment s měsíční výplatou výnosu, zajištěné nemovitostmi."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Allrisk Investment" />
+    <meta property="og:locale" content="cs_CZ" />
+    <meta property="og:url" content="https://allriskmeridieminvestment.cz/" />
+    <meta property="og:title" content="Allrisk Investment" />
+    <meta
+      property="og:description"
+      content="Dluhopisy Allrisk Investment s měsíční výplatou výnosu, zajištěné nemovitostmi."
+    />
+    <meta property="og:image" content="https://allriskmeridieminvestment.cz/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="module" crossorigin src="/allrisk-investment/assets/index-u9kggpUj.js"></script>
+    <link rel="stylesheet" crossorigin href="/allrisk-investment/assets/index-DzqhByVx.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
